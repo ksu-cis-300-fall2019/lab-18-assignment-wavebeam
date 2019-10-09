@@ -11,6 +11,7 @@ using Ksu.Cis300.ImmutableBinaryTrees;
 
 namespace Ksu.Cis300.NameLookup
 {
+
     /// <summary>
     /// A generic dictionary in which keys must implement IComparable.
     /// </summary>
@@ -18,6 +19,7 @@ namespace Ksu.Cis300.NameLookup
     /// <typeparam name="TValue">The value type.</typeparam>
     public class Dictionary<TKey, TValue> where TKey : IComparable<TKey>
     {
+
         /// <summary>
         /// The keys and values in the dictionary.
         /// </summary>
@@ -138,5 +140,90 @@ namespace Ksu.Cis300.NameLookup
             CheckKey(k);
             _elements = Add(_elements, k, v);
         }
+
+        /// <summary>
+        /// Removes the node with the smallest existing KV pair.
+        /// Out's a KV pair of smallest child.
+        /// Returns a tree of original tree.
+        /// Look at the Root.
+        /// If null, return null.
+        /// If the tree is just a root with no children, return KC of root of tree.
+        /// If the tree has Right Child but no Left, Root is smallest. Return KV of root of tree.
+        /// If the tree has Left Child, a smaller must exist. Recursively traverse Left Children until reach LC = null. Return KV of that node.
+        /// 
+        /// </summary>
+        /// <param name="t"></param>
+        /// <param name="min"></param>
+        /// <returns></returns>
+        private static BinaryTreeNode<KeyValuePair<TKey, TValue>> RemoveMininumKey(BinaryTreeNode<KeyValuePair<TKey, TValue>> t, out KeyValuePair<TKey, TValue> min)
+        {
+            if (t.LeftChild == null)
+            {
+
+                min = t.Data;
+                return t.RightChild;
+            }
+            else
+            {
+                BinaryTreeNode<KeyValuePair<TKey, TValue>> newTree = new BinaryTreeNode<KeyValuePair<TKey, TValue>>(t.Data, RemoveMininumKey(t.LeftChild, out min), t.RightChild);
+                return newTree;
+            }
+        }
+
+        /// <summary>
+        /// Removes a node containing a given key from a given tree
+        /// Out's a bool to indicate whether or not the key was found in the tree
+        /// returns a new tree of the removed node
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="t"></param>
+        /// <param name="removed"></param>
+        /// <returns></returns>
+        private static BinaryTreeNode<KeyValuePair<TKey, TValue>> Remove(TKey key, BinaryTreeNode<KeyValuePair<TKey, TValue>> t, out bool removed)
+        {
+
+
+            if (t == null)
+            {
+                removed = false;
+                return t;
+            }
+            else
+            {
+                if (t.Data.Key.CompareTo(key) == 0)
+                {
+                    if (t.LeftChild == null)
+                    {
+                        removed = true;
+                        return t.RightChild;
+                    }
+                    else if (t.RightChild == null)
+                    {
+                        removed = true;
+                        return t.LeftChild;
+                    }
+                    else
+                    {
+                        removed = true;
+                        BinaryTreeNode<KeyValuePair<TKey, TValue>> newRC = RemoveMininumKey(t.RightChild, out KeyValuePair<TKey, TValue> min);
+                        BinaryTreeNode<KeyValuePair<TKey, TValue>> newRoot = new BinaryTreeNode<KeyValuePair<TKey, TValue>>(min, t.LeftChild, newRC);
+                        return newRoot;
+                    }
+                }
+                else if (t.Data.Key.CompareTo(key) < 0)
+                {
+
+                    BinaryTreeNode<KeyValuePair<TKey, TValue>> newRoot = new BinaryTreeNode<KeyValuePair<TKey, TValue>>(min, t.LeftChild, newRC);
+                }
+                else
+                {
+
+                }
+
+            }
+
+        }
+
     }
 }
